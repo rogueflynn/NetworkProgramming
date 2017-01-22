@@ -7,9 +7,10 @@
 #include<error.h>
 #include<arpa/inet.h>
 #include<unistd.h>
+#include<fcntl.h>  	//Needed for non-blocking (asynchronus)
 
 #define ERROR 	-1
-#define MAX_CLIENTS 	2
+#define MAX_CLIENTS 	4
 #define MAX_DATA	1024
 
 main(int argc, char **argv) {
@@ -26,6 +27,8 @@ main(int argc, char **argv) {
 		perror("server socket: ");
 		exit(-1);
 	}
+	//Set to asynchronus
+	fcntl(sock, F_SETFL, O_NONBLOCK);
 
 	server.sin_family = AF_INET;
 	server.sin_port = htons(atoi(argv[1])); //Convert from host byte order to network byte order
@@ -43,6 +46,7 @@ main(int argc, char **argv) {
 		perror("listen");
 		exit(-1);
 	}
+	
 
 	//accept
 	while(1) {
@@ -52,8 +56,11 @@ main(int argc, char **argv) {
 			exit(-1);
 		}	
 
+
+		printf("New IP: %d\n", new);
 		printf("New Client connected on port no %d and IP %s\n", ntohs(client.sin_port), inet_ntoa(client.sin_addr));
 		data_len = 1;
+
 		while(data_len) {
 			data_len = recv(new, data, MAX_DATA, 0);
 
@@ -67,5 +74,6 @@ main(int argc, char **argv) {
 		printf("Client disconnected\n");
 
 		close(new);
+
 	}
 }
