@@ -2,9 +2,12 @@ import socket
 import select
 import Queue
 
-server = socket.socket()			#Create socket object
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)			#Create socket object
 port = 12345					#Set port to listen on
-ip = '192.168.1.133'				#Specify the ip address listeing from
+ip = '172.16.0.9'				#Specify the ip address listeing from
+
+#can get ip bast on the doman name of a site
+#server_ip = socket.gethostbyname(server)
 
 server.bind((ip, port))				#bind the port to the ip
 

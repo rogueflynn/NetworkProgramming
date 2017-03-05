@@ -9,4 +9,6 @@ int socket(int domain, int type, int protocol);
 
 int bind(int sockfd, struct sockaddr *myaddr, int addrlen);
 
+int connect(int sockfd, struct sockaddr, *serv_addr, int addrlen);
+
 
