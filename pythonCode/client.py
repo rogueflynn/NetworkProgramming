@@ -1,18 +1,17 @@
 import socket
 
-client = socket.socket()
-ip = '192.168.1.133'
-port = '12345'
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+ip = '172.16.0.9'
+port = 12345
 
 client.connect((ip, port))
-client.connect((ip, port))
-
 
 while True:
-	message = raw_input("")
+	message = input("")
 	if message == "exit()":
 		client.close()
 		break
 	else:
-		client.send(message)
-		print client.recv(1024) #1024 is how much data that client is going to be receiving.
+		client.send(message.encode())
+		received = client.recv(1024)
+		print(received.decode()) 	#1024 is how much data that client is going to be receiving.
