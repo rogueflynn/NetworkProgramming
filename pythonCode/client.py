@@ -5,9 +5,8 @@ import json
 import threading
 
 #exit flag
-exitFlag = False
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-ip = '172.16.0.9'
+ip = '172.16.0.8'
 port = 12345
 
 client.connect((ip, port))
@@ -19,6 +18,8 @@ class clientThread(threading.Thread):
 		threading.Thread.__init__(self)
 		self.threadID = threadID
 		self.name = name
+		self.stop =  threading.Event()
+
 	def run(self):
 		print("Starting: " + self.name + " thread")
 		if self.name == "send":
@@ -26,15 +27,15 @@ class clientThread(threading.Thread):
 		elif self.name == "receive":
 			receiveMessages(self.name)
 		print("Exiting thread: " + self.name)
-			
-
 
 def receiveMessages(threadName): 
 	while True:
 		received = client.recv(1024)
 		print(received.decode()) 	#1024 is how much data that client is going to be receiving.
+	print("Exiting receiveMessage")
 
 def sendMessages(threadName):
+	global exitFlag
 	#JSON string that is used to initialize the user
 	initialize = '{"user": "' + email + '", "message": "init"}'
 	Init = True
@@ -58,16 +59,14 @@ def sendMessages(threadName):
 clientSend = clientThread(0, "send")
 clientReceive = clientThread(1, "receive")
 
+clientReceive.daemon = True #insures that it will exits when the program is ended
+
 #start threads
 clientSend.start()
 clientReceive.start()
 
-#wait for threads to finish
+#wait for send to finish
 clientSend.join()
-clientReceive.join()
-
-#close connection
-client.close()
 
 print("closing connection and exiting main thread")
-		
+client.close()
