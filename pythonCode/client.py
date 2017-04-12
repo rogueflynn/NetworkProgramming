@@ -1,4 +1,4 @@
-#victor2
+#victor1
 import socket
 import sys
 import json
@@ -6,7 +6,7 @@ import threading
 
 #exit flag
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-ip = '172.16.0.8'
+ip = '192.168.1.133'
 port = 12345
 
 client.connect((ip, port))
@@ -35,16 +35,17 @@ def receiveMessages(threadName):
 	print("Exiting receiveMessage")
 
 def sendMessages(threadName):
-	global exitFlag
 	#JSON string that is used to initialize the user
-	initialize = '{"user": "' + email + '", "message": "init"}'
+	initialize = '{"user": "' + email + '", "message": "init", "disconnect": "0"}'
 	Init = True
 
 	while True:
 		if Init is False: 
 			message = input("")
-			data = '{"user" : "' + email + '", "recipient": "victor1", "message": "' + message + '"}'
+			data = '{"user" : "' + email + '", "recipient": "victor2", "message": "' + message + '", "disconnect": "0"}'
 			if message == "exit()":
+				data = '{"user" : "' + email + '", "recipient": "victor2", "message": "", "disconnect": "1"}'
+				client.send(data.encode())
 				break
 			else:
 				client.send(data.encode())
@@ -69,4 +70,5 @@ clientReceive.start()
 clientSend.join()
 
 print("closing connection and exiting main thread")
+
 client.close()
