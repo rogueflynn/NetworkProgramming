@@ -36,15 +36,19 @@ def receiveMessages(threadName):
 
 def sendMessages(threadName):
 	#JSON string that is used to initialize the user
-	initialize = '{"user": "' + email + '", "message": "init", "disconnect": "0"}'
+	initialize = '{"user": "' + email + '", "message": "", "init": "1", "disconnect": "0"}'
 	Init = True
 
 	while True:
 		if Init is False: 
 			message = input("")
-			data = '{"user" : "' + email + '", "recipient": "victor2", "message": "' + message + '", "disconnect": "0"}'
+			escMessage = message.translate(str.maketrans({
+									"\"": r"\"",
+									"\\": r"\\"
+											}))
+			data = '{"user" : "' + email + '", "recipient": "victor2", "message": "' + escMessage + '", "init": "0",  "disconnect": "0"}'
 			if message == "exit()":
-				data = '{"user" : "' + email + '", "recipient": "victor2", "message": "", "disconnect": "1"}'
+				data = '{"user" : "' + email + '", "recipient": "victor2", "message": "", "init": "0", "disconnect": "1"}'
 				client.send(data.encode())
 				break
 			else:

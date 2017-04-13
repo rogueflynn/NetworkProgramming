@@ -45,7 +45,7 @@ while inputs:
 		else:
 			try:
 				data = sock.recv(1024)
-			except:
+			except ConnectionResetError:
 				continue
 
 			#readable client socket has data
@@ -54,6 +54,7 @@ while inputs:
 				jsonData = data.decode()
 				parsedData = json.loads(jsonData)
 				message = parsedData["message"]	
+				init = parsedData["init"]
 				disconnect = parsedData["disconnect"]
 				if disconnect == "1":
 					#Interpret empty result as closed connection
@@ -80,10 +81,11 @@ while inputs:
 					del router[user]	#delete entry from the router table	
 					del message_queue[terminatingSock]
 				else:
-					if message == "init":
+					if init == "1":
 						#set socket for user
 						user = parsedData["user"]
 						router[user] = sock		
+						print(user, " has connected.");
 						message_queue[sock].put("Connection Initialized")	
 						#Add output channel for response
 						if sock not in outputs:
@@ -102,6 +104,25 @@ while inputs:
 							sendingSock = router[user]
 							outputs.append(sendingSock)
 							message_queue[sendingSock].put("User is not connected")	
+			else:
+				identifier = ""
+				#print(sock.getpeername(), ' has disconnected')
+				#stop listening for input on connection
+				if sock in outputs:
+					outputs.remove(sock)
+				
+				#this for block needs to change to account for different users on the same 
+				#ip address. can use mac address of device to distiguish
+				for key in router:
+					if router[key] == sock:
+						identifier = key 
+						break
+				print(identifier, " has disconnected");	
+				if identifier != "":
+					del router[identifier]	#delete entry from the router table	
+
+				inputs.remove(sock)
+				sock.close()
 						
 	#handle outputs
 	for sock in write:
