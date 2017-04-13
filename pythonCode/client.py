@@ -1,4 +1,4 @@
-#victor1
+#victor2
 import socket
 import sys
 import json
@@ -46,9 +46,9 @@ def sendMessages(threadName):
 									"\"": r"\"",
 									"\\": r"\\"
 											}))
-			data = '{"user" : "' + email + '", "recipient": "victor2", "message": "' + escMessage + '", "init": "0",  "disconnect": "0"}'
+			data = '{"user" : "' + email + '", "recipient": "victor1", "message": "' + escMessage + '", "init": "0",  "disconnect": "0"}'
 			if message == "exit()":
-				data = '{"user" : "' + email + '", "recipient": "victor2", "message": "", "init": "0", "disconnect": "1"}'
+				data = '{"user" : "' + email + '", "recipient": "victor1", "message": "", "init": "0", "disconnect": "1"}'
 				client.send(data.encode())
 				break
 			else:
