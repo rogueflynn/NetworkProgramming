@@ -4,6 +4,7 @@ using System.Collections;
 using System;
 using System.IO;
 using System.Net.Sockets;
+using UnityEngine.UI;
 
 public class ChatArea : MonoBehaviour {
     string sender = "victor2";
@@ -15,15 +16,20 @@ public class ChatArea : MonoBehaviour {
     StreamWriter sw;
     TcpClient client;
     LiteralEscape literal;
+    Text messageArea;
+    InputField sendText;
     public bool disconnected;
     public bool serverStarted;
     string data = "";
+    string messages = "";
 
 	// Use this for initialization
 	void Start () {
         //Client client = new Client(sender, recipient);
         client = new TcpClient();
         literal = new LiteralEscape();
+        messageArea = GameObject.Find("messageArea").GetComponent<Text>();
+        sendText = GameObject.Find("sendText").GetComponent<InputField>();
         try
         {
             client.Connect("192.168.1.133", 12345);
@@ -47,6 +53,21 @@ public class ChatArea : MonoBehaviour {
         clientRecvThread.Start();
 	}
 
+    public void sendStreamMessage()
+    {
+        if (sendText.text != "")
+        {
+            ClientGlobals.message = sendText.text;
+            sendText.text = "";
+            ClientGlobals.messageSent = true;
+        }
+    }
+
+    void Update()
+    {
+        messageArea.text = messages;
+    }
+
     IEnumerator clientSend()
     {
          if (!disconnected)
@@ -58,6 +79,7 @@ public class ChatArea : MonoBehaviour {
             Debug.Log("Client Send Called");
             while (!disconnected)
             {
+                sw.Flush();
                 Debug.Log("Made it to send method loop");
                 if (ClientGlobals.messageSent)
                 {
@@ -86,6 +108,8 @@ public class ChatArea : MonoBehaviour {
                     {
                         data = "{\"user\" : \"" + this.sender + "\", \"recipient\": \"" + this.recipient + "\", \"message\": \"" + message + "\", \"init\": \"0\", \"disconnect\": \"0\"}";
                         sw.WriteLine(data);
+                        Debug.Log("Message: " + message);
+                        ClientGlobals.messageSent = false;
                     }
                 }
                 yield return new WaitForSeconds(0.001f);
@@ -113,6 +137,7 @@ public class ChatArea : MonoBehaviour {
             {
                 //Console.WriteLine(serverMessage);
                 Debug.Log(serverMessage);
+                messages += serverMessage + "\n";
                 serverMessage = "";
             }
         }
@@ -124,8 +149,4 @@ public class ChatArea : MonoBehaviour {
         s.Close();
         sw.Close();
     }
-
-    // Update is called once per frame
-    void Update () {
-	}
 }

@@ -50,60 +50,63 @@ while inputs:
 
 			#readable client socket has data
 			if data:
-				print('Received: ', data.decode())
-				jsonData = data.decode()
-				parsedData = json.loads(jsonData)
-				message = parsedData["message"]	
-				init = parsedData["init"]
-				disconnect = parsedData["disconnect"]
-				if disconnect == "1":
-					#Interpret empty result as closed connection
-					identifier = ""
-					user = parsedData["user"]
-					terminatingSock = router[user]
-					print(terminatingSock.getpeername(), ' has disconnected')
-					#stop listening for input on connection
-					
-					if terminatingSock in outputs:
-						outputs.remove(terminatingSock)
-					
-					#this for block needs to change to account for different users on the same 
-					#ip address. can use mac address of device to distiguish
-	#				for key in router:
-	#					if router[key] == sock:
-	#						identifier = key 
-	#						break
-	#				if identifier != "":
-	#					del router[identifier]	#delete entry from the router table	
-
-					inputs.remove(terminatingSock)
-					terminatingSock.close()
-					del router[user]	#delete entry from the router table	
-					del message_queue[terminatingSock]
-				else:
-					if init == "1":
-						#set socket for user
+				try:
+					print('Received: ', data.decode())
+					jsonData = data.decode()
+					parsedData = json.loads(jsonData)
+					message = parsedData["message"]	
+					init = parsedData["init"]
+					disconnect = parsedData["disconnect"]
+					if disconnect == "1":
+						#Interpret empty result as closed connection
+						identifier = ""
 						user = parsedData["user"]
-						router[user] = sock		
-						print(user, " has connected.");
-						message_queue[sock].put("Connection Initialized")	
-						#Add output channel for response
-						if sock not in outputs:
-							outputs.append(sock)
+						terminatingSock = router[user]
+						print(terminatingSock.getpeername(), ' has disconnected')
+						#stop listening for input on connection
+						
+						if terminatingSock in outputs:
+							outputs.remove(terminatingSock)
+						
+						#this for block needs to change to account for different users on the same 
+						#ip address. can use mac address of device to distiguish
+		#				for key in router:
+		#					if router[key] == sock:
+		#						identifier = key 
+		#						break
+		#				if identifier != "":
+		#					del router[identifier]	#delete entry from the router table	
+
+						inputs.remove(terminatingSock)
+						terminatingSock.close()
+						del router[user]	#delete entry from the router table	
+						del message_queue[terminatingSock]
 					else:
-						receiverName = parsedData["recipient"]
-						print("Receiver", receiverName)
-						if receiverName in router:
-							recepientSocket = router[receiverName]	#get recepient socket
-							message_queue[recepientSocket].put(message)
-							#Add output channel for response
-							if recepientSocket not in outputs:
-								outputs.append(recepientSocket)
-						else:
+						if init == "1":
+							#set socket for user
 							user = parsedData["user"]
-							sendingSock = router[user]
-							outputs.append(sendingSock)
-							message_queue[sendingSock].put("User is not connected")	
+							router[user] = sock		
+							print(user, " has connected.");
+							message_queue[sock].put("Connection Initialized")	
+							#Add output channel for response
+							if sock not in outputs:
+								outputs.append(sock)
+						else:
+							receiverName = parsedData["recipient"]
+							print("Receiver", receiverName)
+							if receiverName in router:
+								recepientSocket = router[receiverName]	#get recepient socket
+								message_queue[recepientSocket].put(message)
+								#Add output channel for response
+								if recepientSocket not in outputs:
+									outputs.append(recepientSocket)
+							else:
+								user = parsedData["user"]
+								sendingSock = router[user]
+								outputs.append(sendingSock)
+								message_queue[sendingSock].put("User is not connected")	
+				except ValueError:
+					continue
 			else:
 				identifier = ""
 				#print(sock.getpeername(), ' has disconnected')
