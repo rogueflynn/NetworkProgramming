@@ -7,8 +7,8 @@ using System.Net.Sockets;
 using UnityEngine.UI;
 
 public class ChatArea : MonoBehaviour {
-    string sender = "victor2";
-    string recipient = "victor1";
+    string sender = "victor1";
+    string recipient = "victor2";
     //Client client;
     //Thread clientSendThread;
     Thread clientRecvThread;
@@ -22,6 +22,7 @@ public class ChatArea : MonoBehaviour {
     public bool serverStarted;
     string data = "";
     string messages = "";
+    bool initialized = false;
 
 	// Use this for initialization
 	void Start () {
@@ -109,6 +110,7 @@ public class ChatArea : MonoBehaviour {
                         data = "{\"user\" : \"" + this.sender + "\", \"recipient\": \"" + this.recipient + "\", \"message\": \"" + message + "\", \"init\": \"0\", \"disconnect\": \"0\"}";
                         sw.WriteLine(data);
                         Debug.Log("Message: " + message);
+                        messages += "<b><color=red>" + this.sender + ":</color></b> " + message + "\n";
                         ClientGlobals.messageSent = false;
                     }
                 }
@@ -137,7 +139,16 @@ public class ChatArea : MonoBehaviour {
             {
                 //Console.WriteLine(serverMessage);
                 Debug.Log(serverMessage);
-                messages += serverMessage + "\n";
+                if (!initialized)
+                {
+                    messages += serverMessage + "\n";
+                    initialized = true;
+                }
+                else
+                {
+                    messages += "<b><color=blue>" + this.recipient + ":</color></b> " + serverMessage + "\n";
+                }
+
                 serverMessage = "";
             }
         }
