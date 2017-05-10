@@ -6,8 +6,8 @@ import threading
 
 #exit flag
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-ip = '192.168.1.133'
-port = 12345
+ip = '153.203.219.224'
+port = 32645 
 
 client.connect((ip, port))
 

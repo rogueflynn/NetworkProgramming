@@ -81,6 +81,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="UnityClient.Plugins.csproj">
+      <Project>{C5F6D8E8-F74C-0A41-F6CE-F259F4EBC880}</Project>
+      <Name>UnityClient.Plugins</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Assets\Client\Client.cs" />
     <Compile Include="Assets\Client\LiteralEscape.cs" />
     <Compile Include="Assets\Client\Program.cs" />
